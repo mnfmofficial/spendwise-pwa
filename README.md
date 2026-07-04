@@ -4,6 +4,9 @@ A lightweight, privacy-focused, spreadsheet-like web application to log daily ex
 
 Built with HTML5, Tailwind CSS, and vanilla JavaScript. Hosted entirely on GitHub Pages as an installable Progressive Web App (PWA).
 
+## 🚀 Live Demo
+👉 **[https://mnfmofficial.github.io/spendwise-pwa/](https://mnfmofficial.github.io/spendwise-pwa/)**
+
 ---
 
 ## ✨ Features
@@ -31,4 +34,4 @@ If you want to run this locally on your machine instead of using the GitHub Page
 
 1. Clone this repository:
    ```bash
-   git clone [https://https://github.com/mnfmofficial/spendwise-pwa]
+   git clone [https://github.com/mnfmofficial/spendwise-pwa.git](https://github.com/mnfmofficial/spendwise-pwa.git)
