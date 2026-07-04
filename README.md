@@ -31,4 +31,4 @@ If you want to run this locally on your machine instead of using the GitHub Page
 
 1. Clone this repository:
    ```bash
-   git clone [https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git](https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git)
+   git clone [https://https://github.com/mnfmofficial/spendwise-pwa]
