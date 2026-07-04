@@ -34,4 +34,4 @@ If you want to run this locally on your machine instead of using the GitHub Page
 
 1. Clone this repository:
    ```bash
-   git clone [https://github.com/mnfmofficial/spendwise-pwa.git](https://github.com/mnfmofficial/spendwise-pwa.git)
+   git clone https://github.com/mnfmofficial/spendwise-pwa.git
