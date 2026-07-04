@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendWise - Personal Expense Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#059669">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/192/2489/2489756.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+
+    <nav class="bg-emerald-600 text-white shadow-md px-6 py-4 mb-8">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-tight">💰 SpendWise</h1>
+            <span class="text-sm bg-emerald-700 px-3 py-1 rounded-full">Local & Secure</span>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="space-y-6 lg:col-span-1">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <h2 class="text-lg font-semibold mb-4 text-slate-700">Set Monthly Budget</h2>
+                <div class="flex gap-2">
+                    <input type="number" id="monthlyBudgetInput" placeholder="Enter Budget" class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500">
+                    <button onclick="updateBudget()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">Save</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <h2 class="text-lg font-semibold mb-4 text-slate-700">Log New Expense</h2>
+                <form id="expenseForm" onsubmit="addExpense(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Amount</label>
+                        <input type="number" step="0.01" id="amount" required class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Category</label>
+                        <select id="category" class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500">
+                            <option value="Food & Dining">Food & Dining</option>
+                            <option value="Rent & Bills">Rent & Bills</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Transportation">Transportation</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Date</label>
+                        <input type="date" id="date" required class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Note / Description</label>
+                        <input type="text" id="note" placeholder="e.g., Grocery store" class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-800 text-white py-2.5 rounded-lg font-medium hover:bg-slate-900 transition">Add Transaction</button>
+                </form>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <h2 class="text-lg font-semibold mb-2 text-slate-700">📋 Bill Reminders</h2>
+                <p class="text-xs text-slate-400 mb-4">Never miss upcoming or recurring payments.</p>
+                <form id="billForm" onsubmit="addBill(event)" class="flex gap-2 mb-4">
+                    <input type="text" id="billName" placeholder="Bill name (e.g., Netflix)" required class="w-full text-sm px-3 py-1.5 border rounded-lg focus:outline-emerald-500">
+                    <input type="date" id="billDate" required class="text-sm px-2 py-1.5 border rounded-lg focus:outline-emerald-500">
+                    <button type="submit" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-emerald-700">Add</button>
+                </form>
+                <ul id="billList" class="space-y-2 max-h-48 overflow-y-auto">
+                    </ul>
+            </div>
+        </div>
+
+        <div class="space-y-6 lg:col-span-2">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Expenditures</p>
+                        <h3 class="text-3xl font-bold text-slate-800 mt-1" id="totalSpentDisplay">$0.00</h3>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex justify-between text-xs text-slate-500 mb-1">
+                            <span>Budget Progress</span>
+                            <span id="budgetPercent">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div id="budgetBar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center justify-center">
+                    <div class="w-full max-w-[240px]">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-wrap gap-3 items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <select id="reportRange" class="px-3 py-1.5 border rounded-lg text-sm focus:outline-emerald-500">
+                        <option value="7">Past 7 Days</option>
+                        <option value="30" selected>Past 30 Days</option>
+                        <option value="all">All Time</option>
+                    </select>
+                    <button onclick="generatePDF()" class="bg-rose-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-rose-700 transition shadow-sm">📥 Download PDF Report</button>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="exportCSV()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg border">Export CSV</button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-slate-700">Transaction History</h2>
+                    <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded" id="logCount">0 Items</span>
+                </div>
+                <div class="overflow-x-auto max-h-[400px]">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <th class="py-3 px-6">Date</th>
+                                <th class="py-3 px-6">Category</th>
+                                <th class="py-3 px-6">Note</th>
+                                <th class="py-3 px-6 text-right">Amount</th>
+                                <th class="py-3 px-6 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenseTableBody" class="text-sm divide-y divide-slate-100">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="pdfTemplate" class="hidden p-8 bg-white text-slate-800">
+        <h1 class="text-3xl font-bold text-emerald-600 mb-2">SpendWise Financial Statement</h1>
+        <p class="text-sm text-slate-500 mb-6">Generated Statement of Expenditures</p>
+        <div class="mb-6 p-4 border rounded-xl bg-slate-50">
+            <p class="text-sm uppercase text-slate-400 font-bold">Total Expenditures in Period</p>
+            <h2 class="text-4xl font-extrabold text-slate-800 mt-1" id="pdfTotal">$0.00</h2>
+        </div>
+        <table class="w-full text-left border-collapse border text-sm mt-4">
+            <thead>
+                <tr class="bg-slate-100 border-b font-semibold">
+                    <th class="p-3">Date</th>
+                    <th class="p-3">Category</th>
+                    <th class="p-3">Note</th>
+                    <th class="p-3 text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody id="pdfTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let expenses = JSON.parse(localStorage.getItem('sw_expenses')) || [];
+        let bills = JSON.parse(localStorage.getItem('sw_bills')) || [];
+        let budget = parseFloat(localStorage.getItem('sw_budget')) || 2000;
+        let myChart = null;
+
+        // Initialize App
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('date').valueAsDate = new Date();
+            document.getElementById('monthlyBudgetInput').value = budget;
+            renderAll();
+        });
+
+        function saveToStorage() {
+            localStorage.setItem('sw_expenses', JSON.stringify(expenses));
+            localStorage.setItem('sw_bills', JSON.stringify(bills));
+            localStorage.setItem('sw_budget', budget.toString());
+        }
+
+        function updateBudget() {
+            const val = parseFloat(document.getElementById('monthlyBudgetInput').value);
+            if (!isNaN(val) && val >= 0) {
+                budget = val;
+                saveToStorage();
+                renderAll();
+            }
+        }
+
+        function addExpense(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const category = document.getElementById('category').value;
+            const date = document.getElementById('date').value;
+            const note = document.getElementById('note').value || '—';
+
+            expenses.unshift({ id: Date.now(), amount, category, date, note });
+            saveToStorage();
+            renderAll();
+            document.getElementById('expenseForm').reset();
+            document.getElementById('date').valueAsDate = new Date();
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(exp => exp.id !== id);
+            saveToStorage();
+            renderAll();
+        }
+
+        function addBill(e) {
+            e.preventDefault();
+            const name = document.getElementById('billName').value;
+            const dueDate = document.getElementById('billDate').value;
+            
+            bills.push({ id: Date.now(), name, dueDate, completed: false });
+            saveToStorage();
+            renderAll();
+            document.getElementById('billForm').reset();
+        }
+
+        function toggleBill(id) {
+            bills = bills.map(b => b.id === id ? { ...b, completed: !b.completed } : b);
+            saveToStorage();
+            renderAll();
+        }
+
+        function deleteBill(id) {
+            bills = bills.filter(b => b.id !== id);
+            saveToStorage();
+            renderAll();
+        }
+
+        function renderAll() {
+            renderExpensesTable();
+            renderDashboardAndChart();
+            renderBills();
+        }
+
+        function renderExpensesTable() {
+            const tbody = document.getElementById('expenseTableBody');
+            tbody.innerHTML = '';
+            document.getElementById('logCount').innerText = `${expenses.length} Items`;
+
+            expenses.forEach(exp => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-6 text-slate-500 whitespace-nowrap">${exp.date}</td>
+                    <td class="py-3 px-6"><span class="px-2 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700">${exp.category}</span></td>
+                    <td class="py-3 px-6 font-medium text-slate-700 max-w-[180px] truncate" title="${exp.note}">${exp.note}</td>
+                    <td class="py-3 px-6 text-right font-bold text-slate-900">$${exp.amount.toFixed(2)}</td>
+                    <td class="py-3 px-6 text-center">
+                        <button onclick="deleteExpense(${exp.id})" class="text-rose-500 hover:text-rose-700 text-xs font-semibold">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderBills() {
+            const list = document.getElementById('billList');
+            list.innerHTML = '';
+            
+            const sortedBills = [...bills].sort((a,b) => a.completed - b.completed);
+
+            sortedBills.forEach(bill => {
+                const li = document.createElement('li');
+                li.className = `flex items-center justify-between p-2.5 rounded-lg border text-sm transition ${bill.completed ? 'bg-slate-50 opacity-60 line-through text-slate-400' : 'bg-white border-slate-200'}`;
+                li.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" ${bill.completed ? 'checked' : ''} onchange="toggleBill(${bill.id})" class="accent-emerald-600 h-4 w-4 cursor-pointer">
+                        <div>
+                            <p class="font-medium">${bill.name}</p>
+                            <p class="text-[10px] text-slate-400">Due: ${bill.dueDate}</p>
+                        </div>
+                    </div>
+                    <button onclick="deleteBill(${bill.id})" class="text-slate-400 hover:text-rose-500 text-xs px-1">✕</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function renderDashboardAndChart() {
+            const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            document.getElementById('totalSpentDisplay').innerText = `$${total.toFixed(2)}`;
+
+            const pct = Math.min((total / (budget || 1)) * 100, 100);
+            document.getElementById('budgetPercent').innerText = `${Math.round((total / (budget || 1)) * 100)}%`;
+            const bar = document.getElementById('budgetBar');
+            bar.style.width = `${pct}%`;
+            if(pct > 90) { bar.className = "bg-rose-500 h-full transition-all duration-500"; }
+            else if(pct > 70) { bar.className = "bg-amber-500 h-full transition-all duration-500"; }
+            else { bar.className = "bg-emerald-500 h-full transition-all duration-500"; }
+
+            const categories = {};
+            expenses.forEach(exp => {
+                categories[exp.category] = (categories[exp.category] || 0) + exp.amount;
+            });
+
+            const labels = Object.keys(categories);
+            const dataValues = Object.values(categories);
+
+            if (myChart) { myChart.destroy(); }
+
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataValues,
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#64748b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Top Expenditures Chart', font: { size: 12 } }
+                    }
+                }
+            });
+        }
+
+        function generatePDF() {
+            const rangeDays = document.getElementById('reportRange').value;
+            const targetDate = new Date();
+            if (rangeDays !== 'all') {
+                targetDate.setDate(targetDate.getDate() - parseInt(rangeDays));
+            }
+
+            const filtered = expenses.filter(exp => {
+                if (rangeDays === 'all') return true;
+                return new Date(exp.date) >= targetDate;
+            });
+
+            const pdfTotal = filtered.reduce((sum, exp) => sum + exp.amount, 0);
+            document.getElementById('pdfTotal').innerText = `$${pdfTotal.toFixed(2)}`;
+
+            const pdfTbody = document.getElementById('pdfTableBody');
+            pdfTbody.innerHTML = '';
+            
+            filtered.forEach(exp => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b text-xs";
+                tr.innerHTML = `
+                    <td class="p-2">${exp.date}</td>
+                    <td class="p-2">${exp.category}</td>
+                    <td class="p-2">${exp.note}</td>
+                    <td class="p-2 text-right font-bold">$${exp.amount.toFixed(2)}</td>
+                `;
+                pdfTbody.appendChild(tr);
+            });
+
+            const element = document.getElementById('pdfTemplate');
+            element.classList.remove('hidden');
+
+            const opt = {
+                margin:       0.5,
+                filename:     `SpendWise_Report_${rangeDays}_Days.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.classList.add('hidden');
+            });
+        }
+
+        function exportCSV() {
+            if(expenses.length === 0) return alert("No data to export!");
+            let csvContent = "data:text/csv;charset=utf-8,Date,Category,Note,Amount\n";
+            expenses.forEach(e => {
+                csvContent += `${e.date},"${e.category.replace(/"/g, '""')}","${e.note.replace(/"/g, '""')}",${e.amount}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "spendwise_export.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Register the Service Worker for PWA compliance
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker Registered!', reg))
+                    .catch(err => console.log('Service Worker Registration Failed', err));
+            });
+        }
+    </script>
+</body>
+</html>
