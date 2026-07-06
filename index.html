@@ -4,51 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpendWise - Personal Expense Tracker</title>
-    <!-- PWA Meta Tags & Manifest Link -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#059669">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/192/2489/2489756.png">
-    <!-- Tailwind CSS for Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js for Visual Insights -->
+    <script>
+        // Configure Tailwind to toggle dark mode via the 'dark' class on the document root
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- html2pdf.js for Report Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans min-h-screen pb-12 transition-colors duration-200">
 
-    <!-- Navbar -->
-    <nav class="bg-emerald-600 text-white shadow-md px-6 py-4 mb-8">
+    <nav class="bg-emerald-600 dark:bg-emerald-800 text-white shadow-md px-6 py-4 mb-8 transition-colors duration-200">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold tracking-tight">💰 SpendWise</h1>
-            <span class="text-sm bg-emerald-700 px-3 py-1 rounded-full">LKR Mode</span>
+            <div class="flex items-center gap-3">
+                <button id="themeToggleBtn" onclick="toggleDarkMode()" class="p-2 rounded-lg bg-emerald-700 dark:bg-emerald-900 hover:bg-emerald-800 dark:hover:bg-emerald-950 transition text-sm flex items-center justify-center min-w-[36px] min-h-[36px]" title="Toggle Dark Mode">
+                    🌙
+                </button>
+                <span class="text-sm bg-emerald-700 dark:bg-emerald-900 px-3 py-1.5 rounded-full font-medium">LKR Mode</span>
+            </div>
         </div>
     </nav>
 
     <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <!-- LEFT COLUMN: Inputs & Budget Setup -->
         <div class="space-y-6 lg:col-span-1">
-            <!-- Set Budget -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                <h2 class="text-lg font-semibold mb-4 text-slate-700">Set Monthly Budget (LKR)</h2>
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-200">
+                <h2 class="text-lg font-semibold mb-4 text-slate-700 dark:text-slate-200">Set Monthly Budget (LKR)</h2>
                 <div class="flex gap-2">
-                    <input type="number" id="monthlyBudgetInput" placeholder="Enter Budget in Rs." class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500">
-                    <button onclick="updateBudget()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">Save</button>
+                    <input type="number" id="monthlyBudgetInput" placeholder="Enter Budget in Rs." class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:placeholder-slate-500">
+                    <button onclick="updateBudget()" class="bg-emerald-600 dark:bg-emerald-700 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 dark:hover:bg-emerald-600 transition">Save</button>
                 </div>
             </div>
 
-            <!-- Log Expense Form -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                <h2 class="text-lg font-semibold mb-4 text-slate-700">Log New Expense</h2>
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-200">
+                <h2 class="text-lg font-semibold mb-4 text-slate-700 dark:text-slate-200">Log New Expense</h2>
                 <form id="expenseForm" onsubmit="addExpense(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Amount (Rs.)</label>
-                        <input type="number" step="0.01" id="amount" required class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">Amount (Rs.)</label>
+                        <input type="number" step="0.01" id="amount" required class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Category</label>
-                        <select id="category" onchange="handleCategoryChange()" class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">Category</label>
+                        <select id="category" onchange="handleCategoryChange()" class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
                             <option value="Food & Dining">Food & Dining</option>
                             <option value="Rent & Bills">Rent & Bills</option>
                             <option value="Shopping">Shopping</option>
@@ -57,76 +60,69 @@
                             <option value="Others">Others</option>
                         </select>
                     </div>
-                    <!-- Dynamic Custom Option Field -->
                     <div id="customCategoryWrapper" class="hidden">
-                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Specify Expense Type</label>
-                        <input type="text" id="customCategory" placeholder="e.g., Medical, Insurance" class="w-full px-3 py-2 border rounded-lg border-emerald-300 focus:outline-emerald-500 bg-emerald-50/30">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">Specify Expense Type</label>
+                        <input type="text" id="customCategory" placeholder="e.g., Medical, Insurance" class="w-full px-3 py-2 border rounded-lg border-emerald-300 focus:outline-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/20 dark:border-emerald-800 dark:text-white">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Date (YYYY-MM-DD)</label>
-                        <input type="date" id="date" required class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">Date (YYYY-MM-DD)</label>
+                        <input type="date" id="date" required class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Note / Description</label>
-                        <input type="text" id="note" placeholder="e.g., Grocery store" class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">Note / Description</label>
+                        <input type="text" id="note" placeholder="e.g., Grocery store" class="w-full px-3 py-2 border rounded-lg focus:outline-emerald-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:placeholder-slate-500">
                     </div>
-                    <!-- Image Bill Upload Attachment -->
                     <div>
-                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Attach Bill Receipt (Optional)</label>
-                        <input type="file" id="billImageInput" accept="image/*" onchange="processImageUpload(event)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
-                        <p class="text-[10px] text-slate-400 mt-1">Images are compressed automatically to save space.</p>
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">Attach Bill Receipt (Optional)</label>
+                        <input type="file" id="billImageInput" accept="image/*" onchange="processImageUpload(event)" class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 dark:file:bg-emerald-950/50 file:text-emerald-700 dark:file:text-emerald-400 hover:file:bg-emerald-100 cursor-pointer">
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Images compress automatically to save device space.</p>
                     </div>
-                    <button type="submit" class="w-full bg-slate-800 text-white py-2.5 rounded-lg font-medium hover:bg-slate-900 transition">Add Transaction</button>
+                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white py-2.5 rounded-lg font-medium transition">Add Transaction</button>
                 </form>
             </div>
 
-            <!-- Bill Reminders Tracker -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                <h2 class="text-lg font-semibold mb-2 text-slate-700">📋 Bill Reminders</h2>
-                <p class="text-xs text-slate-400 mb-4">Never miss upcoming or recurring payments.</p>
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-200">
+                <h2 class="text-lg font-semibold mb-2 text-slate-700 dark:text-slate-200">📋 Bill Reminders</h2>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mb-4">Track upcoming recurring utilities and invoices.</p>
                 <form id="billForm" onsubmit="addBill(event)" class="flex gap-2 mb-4">
-                    <input type="text" id="billName" placeholder="Bill name (e.g., Electricity)" required class="w-full text-sm px-3 py-1.5 border rounded-lg focus:outline-emerald-500">
-                    <input type="date" id="billDate" required class="text-sm px-2 py-1.5 border rounded-lg focus:outline-emerald-500">
-                    <button type="submit" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-emerald-700">Add</button>
+                    <input type="text" id="billName" placeholder="Bill name" required class="w-full text-sm px-3 py-1.5 border rounded-lg focus:outline-emerald-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:placeholder-slate-500">
+                    <input type="date" id="billDate" required class="text-sm px-2 py-1.5 border rounded-lg focus:outline-emerald-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+                    <button type="submit" class="bg-emerald-600 dark:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-emerald-700 transition">Add</button>
                 </form>
                 <ul id="billList" class="space-y-2 max-h-48 overflow-y-auto">
-                    <!-- Bills injection -->
-                </ul>
+                    </ul>
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Dashboard Summary & Spreadsheet Log -->
         <div class="space-y-6 lg:col-span-2">
             
-            <!-- Dashboard Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-200 flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Expenditures</p>
-                        <h3 class="text-3xl font-bold text-slate-800 mt-1" id="totalSpentDisplay">Rs. 0.00</h3>
+                        <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Total Expenditures</p>
+                        <h3 class="text-3xl font-bold text-slate-800 dark:text-slate-100 mt-1" id="totalSpentDisplay">Rs. 0.00</h3>
                     </div>
                     <div class="mt-4">
-                        <div class="flex justify-between text-xs text-slate-500 mb-1">
+                        <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
                             <span>Budget Progress</span>
                             <span id="budgetPercent">0%</span>
                         </div>
-                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                             <div id="budgetBar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center justify-center">
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-200 flex items-center justify-center">
                     <div class="w-full max-w-[240px]">
                         <canvas id="expenseChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- Export & PDF Generation Toolbar -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-wrap gap-3 items-center justify-between">
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-200 flex flex-wrap gap-3 items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <select id="reportRange" class="px-3 py-1.5 border rounded-lg text-sm focus:outline-emerald-500">
+                    <select id="reportRange" class="px-3 py-1.5 border rounded-lg text-sm focus:outline-emerald-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
                         <option value="7">Past 7 Days</option>
                         <option value="30" selected>Past 30 Days</option>
                         <option value="all">All Time</option>
@@ -134,20 +130,30 @@
                     <button onclick="generatePDF()" class="bg-rose-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-rose-700 transition shadow-sm">📥 Download PDF Report</button>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="exportCSV()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg border">Export CSV</button>
+                    <button onclick="exportCSV()" class="text-xs bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-lg border dark:border-slate-700 transition">Export CSV</button>
                 </div>
             </div>
 
-            <!-- Spreadsheet-like Transaction Log -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                    <h2 class="text-lg font-semibold text-slate-700">Transaction History</h2>
-                    <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded" id="logCount">0 Items</span>
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-200 overflow-hidden">
+                <div class="px-6 pt-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center flex-wrap gap-2 bg-slate-50/50 dark:bg-slate-900/50">
+                    <div class="flex gap-4">
+                        <button id="tabIndividualBtn" onclick="switchLogTab('individual')" class="border-b-2 border-emerald-600 dark:border-emerald-400 pb-3 px-1 text-emerald-600 dark:text-emerald-400 font-semibold text-sm transition-all">
+                            📋 Individual Items
+                        </button>
+                        <button id="tabDailyBtn" onclick="switchLogTab('daily')" class="border-b-2 border-transparent pb-3 px-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-medium text-sm transition-all">
+                            📊 Daily Summaries (Totalized)
+                        </button>
+                    </div>
+                    <span class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-1 rounded mb-3" id="logCount">0 Items</span>
                 </div>
-                <div class="overflow-x-auto max-h-[400px]">
+
+                <div id="viewIndividual" class="overflow-x-auto max-h-[400px]">
+                    <div class="p-3 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+                        <input type="text" id="tableSearch" oninput="renderExpensesTable()" placeholder="🔍 Search records..." class="text-xs px-3 py-1.5 border rounded-lg focus:outline-emerald-500 w-full sm:w-64 dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:placeholder-slate-500">
+                    </div>
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            <tr class="bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                 <th class="py-3 px-6">Date (ISO)</th>
                                 <th class="py-3 px-6">Category</th>
                                 <th class="py-3 px-6">Note</th>
@@ -156,64 +162,114 @@
                                 <th class="py-3 px-6 text-center">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="expenseTableBody" class="text-sm divide-y divide-slate-100">
-                            <!-- Rows injection -->
-                        </tbody>
+                        <tbody id="expenseTableBody" class="text-sm divide-y divide-slate-100 dark:divide-slate-800">
+                            </tbody>
                     </table>
                 </div>
+
+                <div id="viewDaily" class="overflow-x-auto max-h-[400px] hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                <th class="py-3 px-6">Calendar Date</th>
+                                <th class="py-3 px-6 text-right">Totalized Expenditure</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailySummaryTableBody" class="text-sm divide-y divide-slate-100 dark:divide-slate-800">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="resetAppDatabase()" class="text-xs text-slate-400 dark:text-slate-500 hover:text-rose-500 transition underline decoration-dotted">Purge Database (Reset All Data)</button>
             </div>
 
         </div>
     </div>
 
-    <!-- VIEW RECEIPT LIGHTBOX MODAL OVERLAY -->
     <div id="receiptModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white p-4 rounded-xl max-w-md w-full relative shadow-2xl animate-in fade-in zoom-in duration-200">
-            <button onclick="closeReceiptModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-700 text-xl font-bold p-1 bg-slate-100 rounded-full h-8 w-8 flex items-center justify-center">✕</button>
-            <h3 class="text-md font-bold text-slate-700 mb-3">Attached Bill Receipt</h3>
-            <div class="w-full bg-slate-50 rounded-lg overflow-hidden border flex items-center justify-center p-2 min-h-[250px]">
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-xl max-w-md w-full relative shadow-2xl transition-colors duration-200">
+            <button onclick="closeReceiptModal()" class="absolute top-3 right-3 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 text-xl font-bold p-1 bg-slate-100 dark:bg-slate-800 rounded-full h-8 w-8 flex items-center justify-center">✕</button>
+            <h3 class="text-md font-bold text-slate-700 dark:text-slate-200 mb-3">Attached Bill Receipt</h3>
+            <div class="w-full bg-slate-50 dark:bg-slate-950 rounded-lg overflow-hidden border dark:border-slate-800 flex items-center justify-center p-2 min-h-[250px]">
                 <img id="modalReceiptImg" src="" alt="Receipt Canvas" class="max-w-full max-h-[70vh] rounded shadow-sm object-contain">
             </div>
         </div>
     </div>
 
-    <!-- HIDDEN PRINTER CONTAINER (For clean PDF generations) -->
-    <div id="pdfTemplate" class="hidden p-8 bg-white text-slate-800">
-        <h1 class="text-3xl font-bold text-emerald-600 mb-2">SpendWise Financial Statement</h1>
-        <p class="text-sm text-slate-500 mb-6">Generated Statement of Expenditures (LKR)</p>
-        <div class="mb-6 p-4 border rounded-xl bg-slate-50">
-            <p class="text-sm uppercase text-slate-400 font-bold">Total Expenditures in Period</p>
-            <h2 class="text-4xl font-extrabold text-slate-800 mt-1" id="pdfTotal">Rs. 0.00</h2>
+    <div style="position: absolute; left: -9999px; top: 0; width: 790px;">
+        <div id="pdfTemplate" class="p-12 bg-white text-slate-800 font-sans">
+            <div style="border-bottom: 2px solid #059669; padding-bottom: 20px; margin-bottom: 20px;">
+                <h1 style="font-size: 28px; font-weight: bold; color: #059669; margin: 0;">SpendWise Financial Statement</h1>
+                <p style="font-size: 13px; color: #64748b; margin-top: 5px;">Personal Ledger Account Summary (LKR Standard)</p>
+            </div>
+            
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                <p style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 0;">Aggregate Spending in Selected Bracket</p>
+                <h2 style="font-size: 36px; font-weight: 800; color: #1e293b; margin: 5px 0 0 0;" id="pdfTotal">Rs. 0.00</h2>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="background-color: #f1f5f9; border-bottom: 2px solid #cbd5e1; text-align: left;">
+                        <th style="padding: 10px; color: #475569;">Date (ISO)</th>
+                        <th style="padding: 10px; color: #475569;">Category</th>
+                        <th style="padding: 10px; color: #475569;">Memo Description</th>
+                        <th style="padding: 10px; color: #475569; text-align: right;">Amount Logged</th>
+                    </tr>
+                </thead>
+                <tbody id="pdfTableBody" style="color: #334155;">
+                    </tbody>
+            </table>
         </div>
-        <table class="w-full text-left border-collapse border text-sm mt-4">
-            <thead>
-                <tr class="bg-slate-100 border-b font-semibold">
-                    <th class="p-3">Date (YYYY-MM-DD)</th>
-                    <th class="p-3">Category</th>
-                    <th class="p-3">Note</th>
-                    <th class="p-3 text-right">Amount</th>
-                </tr>
-            </thead>
-            <tbody id="pdfTableBody"></tbody>
-        </table>
     </div>
 
-    <!-- Application Script Engine -->
     <script>
         let expenses = JSON.parse(localStorage.getItem('sw_expenses')) || [];
         let bills = JSON.parse(localStorage.getItem('sw_bills')) || [];
         let budget = parseFloat(localStorage.getItem('sw_budget')) || 50000;
         let myChart = null;
-        let compressedImageBase64 = null; // Memory container for current upload session
+        let compressedImageBase64 = null;
+        let activeTab = 'individual';
 
-        // Initialize App
         document.addEventListener("DOMContentLoaded", () => {
+            initThemeFramework();
             document.getElementById('date').valueAsDate = new Date();
             document.getElementById('monthlyBudgetInput').value = budget;
             renderAll();
         });
 
-        // Currency Formatter Utility for Sri Lankan Rupees
+        // Theme Initialization and Management
+        function initThemeFramework() {
+            const savedTheme = localStorage.getItem('sw_theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('themeToggleBtn').innerText = "☀️";
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('themeToggleBtn').innerText = "🌙";
+            }
+        }
+
+        function toggleDarkMode() {
+            const docEl = document.documentElement;
+            const toggleBtn = document.getElementById('themeToggleBtn');
+            
+            if (docEl.classList.contains('dark')) {
+                docEl.classList.remove('dark');
+                toggleBtn.innerText = "🌙";
+                localStorage.setItem('sw_theme', 'light');
+            } else {
+                docEl.classList.add('dark');
+                toggleBtn.innerText = "☀️";
+                localStorage.setItem('sw_theme', 'dark');
+            }
+            renderDashboardAndChart(); 
+        }
+
         function formatLKR(amount) {
             return "Rs. " + amount.toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
@@ -233,7 +289,6 @@
             }
         }
 
-        // Toggle text input visibility when "Others" category option is active
         function handleCategoryChange() {
             const selectEl = document.getElementById('category');
             const wrapperEl = document.getElementById('customCategoryWrapper');
@@ -250,34 +305,28 @@
             }
         }
 
-        // Image Scaling compression pipeline to preserve LocalStorage allocations
         function processImageUpload(event) {
             const file = event.target.files[0];
             if (!file) {
                 compressedImageBase64 = null;
                 return;
             }
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 400; // Limit rendering scales
+                    const MAX_WIDTH = 400; 
                     let width = img.width;
                     let height = img.height;
-
                     if (width > MAX_WIDTH) {
                         height *= MAX_WIDTH / width;
                         width = MAX_WIDTH;
                     }
-
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-
-                    // Compress to downscaled JPEG binary map string
                     compressedImageBase64 = canvas.toDataURL('image/jpeg', 0.6);
                 };
                 img.src = e.target.result;
@@ -290,42 +339,53 @@
             document.getElementById('receiptModal').classList.remove('hidden');
         }
 
+        // View Tabs Controller
+        function switchLogTab(target) {
+            activeTab = target;
+            const indBtn = document.getElementById('tabIndividualBtn');
+            const dailyBtn = document.getElementById('tabDailyBtn');
+            const indView = document.getElementById('viewIndividual');
+            const dailyView = document.getElementById('viewDaily');
+
+            if(target === 'individual') {
+                indBtn.className = "border-b-2 border-emerald-600 dark:border-emerald-400 pb-3 px-1 text-emerald-600 dark:text-emerald-400 font-semibold text-sm transition-all";
+                dailyBtn.className = "border-b-2 border-transparent pb-3 px-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-medium text-sm transition-all";
+                indView.classList.remove('hidden');
+                dailyView.classList.add('hidden');
+                renderExpensesTable();
+            } else {
+                indBtn.className = "border-b-2 border-transparent pb-3 px-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-medium text-sm transition-all";
+                dailyBtn.className = "border-b-2 border-emerald-600 dark:border-emerald-400 pb-3 px-1 text-emerald-600 dark:text-emerald-400 font-semibold text-sm transition-all";
+                indView.classList.add('hidden');
+                dailyView.classList.remove('hidden');
+                renderDailySummaries();
+            }
+        }
+
         function closeReceiptModal() {
             document.getElementById('receiptModal').classList.add('hidden');
-            document.getElementById('modalReceiptImg').src = "";
         }
 
         function addExpense(e) {
             e.preventDefault();
             const amount = parseFloat(document.getElementById('amount').value);
             let category = document.getElementById('category').value;
-            
             if (category === 'Others') {
                 const customVal = document.getElementById('customCategory').value.trim();
                 category = customVal ? customVal : 'Others';
             }
-
             const date = document.getElementById('date').value; 
             const note = document.getElementById('note').value || '—';
 
-            expenses.unshift({ 
-                id: Date.now(), 
-                amount, 
-                category, 
-                date, 
-                note,
-                billImage: compressedImageBase64 // Append string asset if present
-            });
-
+            expenses.unshift({ id: Date.now(), amount, category, date, note, billImage: compressedImageBase64 });
             saveToStorage();
             renderAll();
             
-            // Clean resetting workflows
             document.getElementById('expenseForm').reset();
             document.getElementById('customCategoryWrapper').classList.add('hidden');
             document.getElementById('customCategory').required = false;
             document.getElementById('date').valueAsDate = new Date();
-            compressedImageBase64 = null; // Clear working pointer
+            compressedImageBase64 = null;
         }
 
         function deleteExpense(id) {
@@ -338,7 +398,6 @@
             e.preventDefault();
             const name = document.getElementById('billName').value;
             const dueDate = document.getElementById('billDate').value;
-            
             bills.push({ id: Date.now(), name, dueDate, completed: false });
             saveToStorage();
             renderAll();
@@ -358,38 +417,64 @@
         }
 
         function renderAll() {
-            renderExpensesTable();
+            if(activeTab === 'individual') renderExpensesTable(); 
+            else renderDailySummaries();
+            
             renderDashboardAndChart();
             renderBills();
         }
 
         function renderExpensesTable() {
             const tbody = document.getElementById('expenseTableBody');
+            const searchVal = document.getElementById('tableSearch').value.toLowerCase();
             tbody.innerHTML = '';
-            document.getElementById('logCount').innerText = `${expenses.length} Items`;
 
-            expenses.forEach(exp => {
-                // Determine layout indicators if bill properties exist
-                let receiptColumnHTML = `<span class="text-slate-300">—</span>`;
+            const filtered = expenses.filter(exp => exp.category.toLowerCase().includes(searchVal) || exp.note.toLowerCase().includes(searchVal));
+            document.getElementById('logCount').innerText = `${filtered.length} Items`;
+
+            filtered.forEach(exp => {
+                let receiptHTML = `<span class="text-slate-300 dark:text-slate-700">—</span>`;
                 if(exp.billImage) {
-                    receiptColumnHTML = `
-                        <button onclick="openReceiptModal('${exp.billImage}')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
-                            🖼️ View
-                        </button>
-                    `;
+                    receiptHTML = `<button onclick="openReceiptModal('${exp.billImage}')" class="bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">🖼️ View</button>`;
                 }
-
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/30 transition border-b border-slate-100 dark:border-slate-800/50";
                 tr.innerHTML = `
-                    <td class="py-3 px-6 text-slate-500 whitespace-nowrap tracking-wider">${exp.date}</td>
-                    <td class="py-3 px-6"><span class="px-2 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700">${exp.category}</span></td>
-                    <td class="py-3 px-6 font-medium text-slate-700 max-w-[180px] truncate" title="${exp.note}">${exp.note}</td>
-                    <td class="py-3 px-6 text-center">${receiptColumnHTML}</td>
-                    <td class="py-3 px-6 text-right font-bold text-slate-900">${formatLKR(exp.amount)}</td>
-                    <td class="py-3 px-6 text-center">
-                        <button onclick="deleteExpense(${exp.id})" class="text-rose-500 hover:text-rose-700 text-xs font-semibold">Delete</button>
-                    </td>
+                    <td class="py-3 px-6 text-slate-500 dark:text-slate-400 whitespace-nowrap tracking-wider">${exp.date}</td>
+                    <td class="py-3 px-6"><span class="px-2 py-1 rounded-md text-xs font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">${exp.category}</span></td>
+                    <td class="py-3 px-6 font-medium text-slate-700 dark:text-slate-300 max-w-[180px] truncate" title="${exp.note}">${exp.note}</td>
+                    <td class="py-3 px-6 text-center">${receiptHTML}</td>
+                    <td class="py-3 px-6 text-right font-bold text-slate-900 dark:text-slate-100">${formatLKR(exp.amount)}</td>
+                    <td class="py-3 px-6 text-center"><button onclick="deleteExpense(${exp.id})" class="text-rose-500 hover:text-rose-700 text-xs font-semibold">Delete</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Totals sums on a distinct day-by-day basis
+        function renderDailySummaries() {
+            const tbody = document.getElementById('dailySummaryTableBody');
+            tbody.innerHTML = '';
+
+            const dailyTotals = {};
+            expenses.forEach(exp => {
+                dailyTotals[exp.date] = (dailyTotals[exp.date] || 0) + exp.amount;
+            });
+
+            const sortedDates = Object.keys(dailyTotals).sort((a, b) => b.localeCompare(a));
+            document.getElementById('logCount').innerText = `${sortedDates.length} Days Logged`;
+
+            if(sortedDates.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-slate-400 dark:text-slate-600">No transactions recorded yet.</td></tr>`;
+                return;
+            }
+
+            sortedDates.forEach(date => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/30 transition border-b border-slate-100 dark:border-slate-800/50";
+                tr.innerHTML = `
+                    <td class="py-3 px-6 font-mono text-slate-600 dark:text-slate-400 tracking-wider">${date}</td>
+                    <td class="py-3 px-6 text-right font-bold text-emerald-600 dark:text-emerald-400">${formatLKR(dailyTotals[date])}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -398,19 +483,14 @@
         function renderBills() {
             const list = document.getElementById('billList');
             list.innerHTML = '';
-            
             const sortedBills = [...bills].sort((a,b) => a.completed - b.completed);
-
             sortedBills.forEach(bill => {
                 const li = document.createElement('li');
-                li.className = `flex items-center justify-between p-2.5 rounded-lg border text-sm transition ${bill.completed ? 'bg-slate-50 opacity-60 line-through text-slate-400' : 'bg-white border-slate-200'}`;
+                li.className = `flex items-center justify-between p-2.5 rounded-lg border text-sm transition ${bill.completed ? 'bg-slate-50 dark:bg-slate-950/40 opacity-60 line-through text-slate-400 dark:text-slate-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`;
                 li.innerHTML = `
                     <div class="flex items-center gap-3">
                         <input type="checkbox" ${bill.completed ? 'checked' : ''} onchange="toggleBill(${bill.id})" class="accent-emerald-600 h-4 w-4 cursor-pointer">
-                        <div>
-                            <p class="font-medium">${bill.name}</p>
-                            <p class="text-[10px] text-slate-400">Due (ISO): ${bill.dueDate}</p>
-                        </div>
+                        <div><p class="font-medium text-slate-700 dark:text-slate-300">${bill.name}</p><p class="text-[10px] text-slate-400 dark:text-slate-500">Due (ISO): ${bill.dueDate}</p></div>
                     </div>
                     <button onclick="deleteBill(${bill.id})" class="text-slate-400 hover:text-rose-500 text-xs px-1">✕</button>
                 `;
@@ -426,35 +506,35 @@
             document.getElementById('budgetPercent').innerText = `${Math.round((total / (budget || 1)) * 100)}%`;
             const bar = document.getElementById('budgetBar');
             bar.style.width = `${pct}%`;
-            if(pct > 90) { bar.className = "bg-rose-500 h-full transition-all duration-500"; }
-            else if(pct > 70) { bar.className = "bg-amber-500 h-full transition-all duration-500"; }
-            else { bar.className = "bg-emerald-500 h-full transition-all duration-500"; }
+            if(pct > 90) bar.className = "bg-rose-500 h-full transition-all duration-500";
+            else if(pct > 70) bar.className = "bg-amber-500 h-full transition-all duration-500";
+            else bar.className = "bg-emerald-500 h-full transition-all duration-500";
 
             const categories = {};
-            expenses.forEach(exp => {
-                categories[exp.category] = (categories[exp.category] || 0) + exp.amount;
-            });
-
+            expenses.forEach(exp => { categories[exp.category] = (categories[exp.category] || 0) + exp.amount; });
             const labels = Object.keys(categories);
             const dataValues = Object.values(categories);
 
-            if (myChart) { myChart.destroy(); }
+            const isDarkActive = document.documentElement.classList.contains('dark');
 
+            if (myChart) myChart.destroy();
             const ctx = document.getElementById('expenseChart').getContext('2d');
             myChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        data: dataValues,
-                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#64748b']
-                    }]
+                    datasets: [{ data: dataValues, backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#64748b'] }]
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        title: { display: true, text: 'Top Expenditures Chart', font: { size: 12 } }
+                    plugins: { 
+                        legend: { display: false }, 
+                        title: { 
+                            display: true, 
+                            text: 'Top Expenditures Chart', 
+                            color: isDarkActive ? '#cbd5e1' : '#475569',
+                            font: { size: 12, weight: '600' } 
+                        } 
                     }
                 }
             });
@@ -462,14 +542,14 @@
 
         function generatePDF() {
             const rangeDays = document.getElementById('reportRange').value;
-            const targetDate = new Date();
-            if (rangeDays !== 'all') {
-                targetDate.setDate(targetDate.getDate() - parseInt(rangeDays));
-            }
+            const cutoffDate = new Date();
+            cutoffDate.setHours(0,0,0,0);
+            if (rangeDays !== 'all') cutoffDate.setDate(cutoffDate.getDate() - parseInt(rangeDays));
 
             const filtered = expenses.filter(exp => {
                 if (rangeDays === 'all') return true;
-                return new Date(exp.date) >= targetDate;
+                const expDateObj = new Date(exp.date + 'T00:00:00');
+                return expDateObj >= cutoffDate;
             });
 
             const pdfTotal = filtered.reduce((sum, exp) => sum + exp.amount, 0);
@@ -478,39 +558,37 @@
             const pdfTbody = document.getElementById('pdfTableBody');
             pdfTbody.innerHTML = '';
             
-            filtered.forEach(exp => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b text-xs";
-                tr.innerHTML = `
-                    <td class="p-2 tracking-wider">${exp.date}</td>
-                    <td class="p-2">${exp.category}</td>
-                    <td class="p-2">${exp.note}</td>
-                    <td class="p-2 text-right font-bold">${formatLKR(exp.amount)}</td>
-                `;
-                pdfTbody.appendChild(tr);
-            });
+            if(filtered.length === 0) {
+                pdfTbody.innerHTML = `<tr><td colspan="4" style="padding: 20px; text-align: center; color: #94a3b8;">No transactions found in this time frame.</td></tr>`;
+            } else {
+                filtered.forEach(exp => {
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = "1px solid #e2e8f0";
+                    tr.innerHTML = `
+                        <td style="padding: 10px; font-family: monospace;">${exp.date}</td>
+                        <td style="padding: 10px;"><span style="background-color: #f0fdf4; color: #166534; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;">${exp.category}</span></td>
+                        <td style="padding: 10px; max-width: 250px; word-wrap: break-word;">${exp.note}</td>
+                        <td style="padding: 10px; text-align: right; font-weight: bold; color: #0f172a;">${formatLKR(exp.amount)}</td>
+                    `;
+                    pdfTbody.appendChild(tr);
+                });
+            }
 
             const element = document.getElementById('pdfTemplate');
-            element.classList.remove('hidden');
-
             const opt = {
-                margin:       0.5,
-                filename:     `SpendWise_LKR_Report_${rangeDays}_Days.pdf`,
+                margin:       [0.4, 0.4, 0.4, 0.4],
+                filename:     `SpendWise_LKR_Statement_${rangeDays}_days.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                element.classList.add('hidden');
-            });
+            html2pdf().set(opt).from(element).save();
         }
 
         function exportCSV() {
             if(expenses.length === 0) return alert("No data to export!");
             let csvContent = "data:text/csv;charset=utf-8,Date(YYYY-MM-DD),Category,Note,ReceiptAttached,Amount(LKR)\n";
             expenses.forEach(e => {
-                // Safeguard: Write "[YES]" or "[NO]" tags to prevent massive raw base64 data from crashing Microsoft Excel
                 const hasReceipt = e.billImage ? "YES" : "NO";
                 csvContent += `${e.date},"${e.category.replace(/"/g, '""')}","${e.note.replace(/"/g, '""')}",${hasReceipt},${e.amount}\n`;
             });
@@ -523,12 +601,22 @@
             document.body.removeChild(link);
         }
 
-        // Register the Service Worker for PWA compliance
+        function resetAppDatabase() {
+            if(confirm("🚨 WARNING: This will permanently wipe all local database records. Proceed?")) {
+                localStorage.clear();
+                expenses = []; bills = []; budget = 50000;
+                renderAll();
+                document.getElementById('monthlyBudgetInput').value = budget;
+                initThemeFramework(); 
+                alert("Database wiped.");
+            }
+        }
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker Registered!', reg))
-                    .catch(err => console.log('Service Worker Registration Failed', err));
+                    .then(reg => console.log('Service Worker Active'))
+                    .catch(err => console.log('Registration Error', err));
             });
         }
     </script>
