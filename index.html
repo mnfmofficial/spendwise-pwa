@@ -6,7 +6,7 @@
     <title>SpendWise - Personal Expense Tracker</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#059669">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/192/2489/2489756.png">
+    <link class="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/192/2489/2489756.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -205,7 +205,6 @@
         let budget = parseFloat(localStorage.getItem('sw_budget')) || 50000;
         let myChart = null;
         let compressedImageBase64 = null;
-        // Keep track of which date entries are currently toggled open
         let expandedDates = {};
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -330,8 +329,6 @@
             const note = document.getElementById('note').value || '—';
 
             expenses.unshift({ id: Date.now(), amount, category, date, note, billImage: compressedImageBase64 });
-            
-            // Auto expand the date row we just logged into for immediate confirmation
             expandedDates[date] = true;
 
             saveToStorage();
@@ -393,7 +390,6 @@
             renderBills();
         }
 
-        // Filter and Render Unified Accordion Matrix
         function renderLedger() {
             const container = document.getElementById('ledgerAccordionContainer');
             container.innerHTML = '';
@@ -401,14 +397,12 @@
             const searchVal = document.getElementById('ledgerSearch').value.toLowerCase();
             const catFilter = document.getElementById('ledgerCategoryFilter').value;
 
-            // 1. Filter raw transactions array matching inputs
             const filteredExpenses = expenses.filter(exp => {
                 const matchesSearch = exp.note.toLowerCase().includes(searchVal) || exp.category.toLowerCase().includes(searchVal);
                 const matchesCategory = (catFilter === 'All') || (exp.category === catFilter);
                 return matchesSearch && matchesCategory;
             });
 
-            // 2. Group elements dynamically by ISO dates
             const dailyGroups = {};
             filteredExpenses.forEach(exp => {
                 if (!dailyGroups[exp.date]) {
@@ -425,7 +419,6 @@
                 return;
             }
 
-            // 3. Render structural expandable DOM pieces
             sortedDates.forEach(date => {
                 const group = dailyGroups[date];
                 const isOpen = !!expandedDates[date];
@@ -433,7 +426,6 @@
                 const dayWrapper = document.createElement('div');
                 dayWrapper.className = "w-full transition-colors";
 
-                // Header interactive summary trigger
                 const headerRow = document.createElement('div');
                 headerRow.className = "flex justify-between items-center px-6 py-3.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer select-none border-b border-slate-100 dark:border-slate-800/40 transition";
                 headerRow.onclick = () => toggleDateAccordion(date);
@@ -446,7 +438,6 @@
                     <span class="font-bold text-emerald-600 dark:text-emerald-400">${formatLKR(group.total)}</span>
                 `;
 
-                // Collapsible detailed contents list
                 const detailsPanel = document.createElement('div');
                 detailsPanel.id = `panel-${date}`;
                 detailsPanel.className = `overflow-x-auto bg-slate-50/50 dark:bg-slate-950/30 px-6 py-2 ${isOpen ? '' : 'hidden'}`;
@@ -598,7 +589,7 @@
         }
 
         function exportCSV() {
-            if(expenses.length === 0) return alert("No data to export!");
+            if(expenses.length === 0) return; // Silent return for structural integration
             let csvContent = "data:text/csv;charset=utf-8,Date(YYYY-MM-DD),Category,Note,ReceiptAttached,Amount(LKR)\n";
             expenses.forEach(e => {
                 const hasReceipt = e.billImage ? "YES" : "NO";
@@ -614,13 +605,18 @@
         }
 
         function resetAppDatabase() {
-            if(confirm("🚨 WARNING: This will permanently wipe all local database records. Proceed?")) {
+            if(confirm("🚨 WARNING: This will permanently wipe all local database records. A safety backup CSV will be automatically downloaded to your device first. Proceed?")) {
+                // Failsafe auto-backup triggers instantly before deletion
+                if(expenses.length > 0) {
+                    exportCSV();
+                }
+                
                 localStorage.clear();
                 expenses = []; bills = []; budget = 50000; expandedDates = {};
                 renderAll();
                 document.getElementById('monthlyBudgetInput').value = budget;
                 initThemeFramework(); 
-                alert("Database wiped.");
+                alert("Database wiped. If your database contained logs, your backup file has downloaded successfully.");
             }
         }
 
